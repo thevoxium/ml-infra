@@ -1,6 +1,5 @@
 #include <cstddef>
 #include <cstring>
-#include <iostream>
 #include <utility>
 
 class simple_string {
