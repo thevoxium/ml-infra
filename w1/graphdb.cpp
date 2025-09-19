@@ -116,7 +116,7 @@ public:
 
   NodePtr createNode(std::string &label);
   NodePtr getNode(NodeId id) const;
-  EdgePtr createEdge(std::string &label);
+  EdgePtr createEdge(std::string &label, NodePtr from, NodePtr to);
   EdgePtr getEdge(EdgeId id) const;
 };
 
@@ -133,8 +133,8 @@ NodePtr Graph::getNode(NodeId id) const {
   return it->second;
 }
 
-EdgePtr Graph::createEdge(std::string &label) {
-  EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label);
+EdgePtr Graph::createEdge(std::string &label, NodePtr from, NodePtr to) {
+  EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label, from, to);
   this->edges[this->nextEdgeId++] = newEdge;
   return newEdge;
 }
