@@ -69,6 +69,37 @@ const PropertyValue &Node::getProperty(const std::string &key) const {
   return it->second;
 }
 
+class Edge {
+private:
+  EdgeId id;
+  std::string label;
+  NodePtr from, to;
+
+public:
+  Edge(EdgeId id, std::string label, NodePtr from, NodePtr to) {
+    this->id = id;
+    this->label = label;
+    this->from = from;
+    this->to = to;
+  }
+
+  Edge(Edge &other) = delete;
+  Edge &operator=(Edge &other) = delete;
+  Edge(Edge &&other) = default;
+  Edge &operator=(Edge &&other) = default;
+  ~Edge() = default;
+
+  EdgeId getId() const;
+  const std::string &getLabel() const;
+  const NodePtr &getFrom() const;
+  const NodePtr &getTo() const;
+};
+
+EdgeId Edge::getId() const { return this->id; }
+const std::string &Edge::getLabel() const { return this->label; }
+const NodePtr &Edge::getFrom() const { return this->from; }
+const NodePtr &Edge::getTo() const { return this->to; }
+
 int main() {
   NodePtr newNode = std::make_shared<Node>(1, "anshul");
   newNode->setProperty("age", 24);
