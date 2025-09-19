@@ -13,10 +13,26 @@ struct func {
   }
 };
 
+class threadGuard {
+private:
+  std::thread t;
+
+public:
+  threadGuard(std::thread t_) : t(std::move(t_)) {}
+  threadGuard(const threadGuard &other) = delete;
+  threadGuard &operator=(const threadGuard &other) = delete;
+  ~threadGuard() {
+    if (t.joinable()) {
+      t.join();
+    }
+  }
+};
+
 void bug() {
   int num_local = 10;
   func f{num_local};
   std::thread t{f};
+  threadGuard g{std::move(t)};
 }
 int main() {
   bug();
