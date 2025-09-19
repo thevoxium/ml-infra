@@ -43,6 +43,7 @@ public:
   void setProperty(const std::string &key, PropertyValue value);
   bool hasProperty(const std::string &key) const;
   const PropertyValue &getProperty(const std::string &key) const;
+  template <typename T> T getPropertyAs(const std::string &key) const;
 };
 
 NodeId Node::getId() const { return this->id; }
@@ -64,6 +65,13 @@ const PropertyValue &Node::getProperty(const std::string &key) const {
     throw std::out_of_range("Property '" + key + "' not found");
   }
   return it->second;
+}
+template <typename T> T Node::getPropertyAs(const std::string &key) const {
+  try {
+    return std::get<T>(getProperty(key));
+  } catch (std::bad_variant_access) {
+    throw std::runtime_error("Type mismatch for property '" + key + "'");
+  }
 }
 
 class Edge {
@@ -118,7 +126,7 @@ public:
   EdgePtr createEdge(const std::string &label, NodePtr from, NodePtr to);
   EdgePtr getEdge(EdgeId id) const;
 
-  const std::vector<EdgePtr> getEdgesFromNode(NodeId nodeId) const;
+  std::vector<EdgePtr> getEdgesFromNode(NodeId nodeId) const;
   void dfs(NodeId id) const;
 };
 
@@ -155,7 +163,7 @@ EdgePtr Graph::getEdge(EdgeId id) const {
   }
   return it->second;
 }
-const std::vector<EdgePtr> Graph::getEdgesFromNode(NodeId nodeId) const {
+std::vector<EdgePtr> Graph::getEdgesFromNode(NodeId nodeId) const {
   auto it = this->adjList.find(nodeId);
   if (it == this->adjList.end()) {
     return {};
@@ -178,8 +186,8 @@ void Graph::dfsHelper(NodeId id, std::unordered_set<NodeId> &visited) const {
   if (!curr)
     return;
   std::cout << curr->getLabel() << std::endl;
-  const std::vector<EdgePtr> &edges = getEdgesFromNode(id);
-  for (const auto &edge : edges) {
+  std::vector<EdgePtr> edges = getEdgesFromNode(id);
+  for (auto &edge : edges) {
     NodeId neighborId = edge->getTo()->getId();
     dfsHelper(neighborId, visited);
   }
