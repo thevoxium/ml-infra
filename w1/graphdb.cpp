@@ -101,8 +101,8 @@ const NodePtr &Edge::getFrom() const { return this->from; }
 const NodePtr &Edge::getTo() const { return this->to; }
 
 int main() {
-  NodePtr newNode = std::make_shared<Node>(1, "anshul");
-  newNode->setProperty("age", 24);
-  std::cout << std::get<int>(newNode->getProperty("age")) << std::endl;
+  NodePtr nodeA = std::make_shared<NodePtr>(1, "anshul");
+  nodeA->setProperty("age", 24);
+
   return 0;
 }
