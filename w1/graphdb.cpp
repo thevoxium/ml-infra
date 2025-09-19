@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
-#include <stack>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -13,7 +12,7 @@ class Node;
 class Edge;
 class Graph;
 
-using PropertyValue = std::variant<int, std::string, bool>;
+using PropertyValue = std::variant<int, double, std::string, bool>;
 using NodePtr = std::shared_ptr<Node>;
 using EdgePtr = std::shared_ptr<Edge>;
 using NodeId = size_t;
@@ -56,13 +55,13 @@ void Node::setProperty(const std::string &key, PropertyValue value) {
   this->properties[key] = std::move(value);
 }
 bool Node::hasProperty(const std::string &key) const {
-  return this->properties.find(key) == this->properties.end() ? false : true;
+  return this->properties.find(key) != this->properties.end();
 }
 
 const PropertyValue &Node::getProperty(const std::string &key) const {
   auto it = this->properties.find(key);
   if (it == this->properties.end()) {
-    throw std::runtime_error("Property '" + key + "' not found");
+    throw std::out_of_range("Property '" + key + "' not found");
   }
   return it->second;
 }
@@ -81,8 +80,8 @@ public:
     this->to = to;
   }
 
-  Edge(Edge &other) = delete;
-  Edge &operator=(Edge &other) = delete;
+  Edge(const Edge &other) = delete;
+  Edge &operator=(const Edge &other) = delete;
   Edge(Edge &&other) = default;
   Edge &operator=(Edge &&other) = default;
   ~Edge() = default;
@@ -119,7 +118,7 @@ public:
   EdgePtr createEdge(const std::string &label, NodePtr from, NodePtr to);
   EdgePtr getEdge(EdgeId id) const;
 
-  const std::vector<EdgePtr> &getEdgesFromNode(NodeId nodeId) const;
+  const std::vector<EdgePtr> getEdgesFromNode(NodeId nodeId) const;
   void dfs(NodeId id) const;
 };
 
@@ -137,6 +136,13 @@ NodePtr Graph::getNode(NodeId id) const {
 }
 
 EdgePtr Graph::createEdge(const std::string &label, NodePtr from, NodePtr to) {
+  if (!from || !to) {
+    throw std::invalid_argument("From and to nodes cannot be null");
+  }
+  if (this->nodes.find(from->getId()) == this->nodes.end() ||
+      this->nodes.find(to->getId()) == this->nodes.end()) {
+    throw std::invalid_argument("Nodes must exist in this graph");
+  }
   EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label, from, to);
   this->edges[this->nextEdgeId++] = newEdge;
   this->adjList[from->getId()].push_back(newEdge);
@@ -149,16 +155,17 @@ EdgePtr Graph::getEdge(EdgeId id) const {
   }
   return it->second;
 }
-const std::vector<EdgePtr> &Graph::getEdgesFromNode(NodeId nodeId) const {
-  static const std::vector<EdgePtr> emptyVector;
+const std::vector<EdgePtr> Graph::getEdgesFromNode(NodeId nodeId) const {
   auto it = this->adjList.find(nodeId);
   if (it == this->adjList.end()) {
-    return emptyVector;
+    return {};
   }
   return it->second;
 }
 
 void Graph::dfs(NodeId id) const {
+  if (!getNode(id))
+    return;
   std::unordered_set<NodeId> visited;
   dfsHelper(id, visited);
 }
@@ -173,10 +180,8 @@ void Graph::dfsHelper(NodeId id, std::unordered_set<NodeId> &visited) const {
   std::cout << curr->getLabel() << std::endl;
   const std::vector<EdgePtr> &edges = getEdgesFromNode(id);
   for (const auto &edge : edges) {
-    if (edge->getFrom()->getId() == id) {
-      NodeId neighborId = edge->getTo()->getId();
-      dfsHelper(neighborId, visited);
-    }
+    NodeId neighborId = edge->getTo()->getId();
+    dfsHelper(neighborId, visited);
   }
 }
 
