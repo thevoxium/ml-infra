@@ -146,12 +146,9 @@ EdgePtr Graph::getEdge(EdgeId id) const {
   return it->second;
 }
 int main() {
-  NodePtr nodeA = std::make_shared<Node>(1, "anshul");
-  nodeA->setProperty("age", 24);
-
-  NodePtr nodeB = std::make_shared<Node>(1, "batman");
-  nodeB->setProperty("age", 45);
-
-  EdgePtr edgeAtoB = std::make_shared<Edge>(1, "AtoB", nodeA, nodeB);
+  Graph graph;
+  NodePtr nodeA = graph.createNode("anshul");
+  NodePtr nodeB = graph.createNode("batman");
+  EdgePtr edgeAtoB = graph.createEdge("AtoB", nodeA, nodeB);
   return 0;
 }
