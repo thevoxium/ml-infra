@@ -1,9 +1,11 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 
@@ -103,6 +105,7 @@ private:
   std::unordered_map<NodeId, NodePtr> nodes;
   std::unordered_map<EdgeId, EdgePtr> edges;
   std::unordered_map<NodeId, std::vector<EdgePtr>> adjList;
+  void dfsHelper(NodeId id, std::unordered_set<NodeId> &visited) const;
 
 public:
   Graph() = default;
@@ -117,6 +120,7 @@ public:
   EdgePtr getEdge(EdgeId id) const;
 
   const std::vector<EdgePtr> &getEdgesFromNode(NodeId nodeId) const;
+  void dfs(NodeId id) const;
 };
 
 NodePtr Graph::createNode(const std::string &label) {
@@ -154,20 +158,45 @@ const std::vector<EdgePtr> &Graph::getEdgesFromNode(NodeId nodeId) const {
   return it->second;
 }
 
+void Graph::dfs(NodeId id) const {
+  std::unordered_set<NodeId> visited;
+  dfsHelper(id, visited);
+}
+void Graph::dfsHelper(NodeId id, std::unordered_set<NodeId> &visited) const {
+  if (visited.count(id)) {
+    return;
+  }
+  visited.insert(id);
+  NodePtr curr = getNode(id);
+  if (!curr)
+    return;
+  std::cout << curr->getLabel() << std::endl;
+  const std::vector<EdgePtr> &edges = getEdgesFromNode(id);
+  for (const auto &edge : edges) {
+    if (edge->getFrom()->getId() == id) {
+      NodeId neighborId = edge->getTo()->getId();
+      dfsHelper(neighborId, visited);
+    }
+  }
+}
+
 int main() {
   Graph graph;
   NodePtr nodeA = graph.createNode("anshul");
   NodePtr nodeB = graph.createNode("batman");
   NodePtr nodeC = graph.createNode("charlie");
 
-  EdgePtr edgeAtoB = graph.createEdge("friend", nodeA, nodeB);
-  EdgePtr edgeAtoC = graph.createEdge("colleague", nodeA, nodeC);
+  graph.createEdge("friend", nodeA, nodeB);
+  graph.createEdge("colleague", nodeA, nodeC);
+  graph.createEdge("neighbor", nodeB, nodeC);
 
   const auto &edgesFromA = graph.getEdgesFromNode(nodeA->getId());
   std::cout << "Edges from node A: " << edgesFromA.size() << std::endl;
 
   const auto &edgesFromB = graph.getEdgesFromNode(nodeB->getId());
   std::cout << "Edges from node B: " << edgesFromB.size() << std::endl;
+
+  graph.dfs(nodeB->getId());
 
   return 0;
 }
