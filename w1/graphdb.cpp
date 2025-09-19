@@ -100,6 +100,51 @@ const std::string &Edge::getLabel() const { return this->label; }
 const NodePtr &Edge::getFrom() const { return this->from; }
 const NodePtr &Edge::getTo() const { return this->to; }
 
+class Graph {
+private:
+  NodeId nextNodeId = 0;
+  EdgeId nextEdgeId = 0;
+  std::unordered_map<NodeId, NodePtr> nodes;
+  std::unordered_map<EdgeId, EdgePtr> edges;
+
+public:
+  Graph() = default;
+  Graph(const Graph &) = delete;
+  Graph &operator=(const Graph &) = delete;
+  Graph(Graph &&) = default;
+  Graph &operator=(Graph &&) = default;
+
+  NodePtr createNode(std::string &label);
+  NodePtr getNode(NodeId id) const;
+  EdgePtr createEdge(std::string &label);
+  EdgePtr getEdge(EdgeId id) const;
+};
+
+NodePtr Graph::createNode(std::string &label) {
+  NodePtr newNode = std::make_shared<Node>(this->nextNodeId, label);
+  this->nodes[this->nextNodeId++] = newNode;
+  return newNode;
+}
+NodePtr Graph::getNode(NodeId id) const {
+  auto it = this->nodes.find(id);
+  if (it == this->nodes.end()) {
+    return nullptr;
+  }
+  return it->second;
+}
+
+EdgePtr Graph::createEdge(std::string &label) {
+  EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label);
+  this->edges[this->nextEdgeId++] = newEdge;
+  return newEdge;
+}
+EdgePtr Graph::getEdge(EdgeId id) const {
+  auto it = this->edges.find(id);
+  if (it == this->edges.end()) {
+    return nullptr;
+  }
+  return it->second;
+}
 int main() {
   NodePtr nodeA = std::make_shared<Node>(1, "anshul");
   nodeA->setProperty("age", 24);
