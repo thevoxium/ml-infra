@@ -1,10 +1,8 @@
 #include <iostream>
 #include <thread>
 
-void hello() { std::cout << "Hello threading" << std::endl; }
-
 int main() {
-  std::thread t(hello);
+  std::thread t([] { std::cout << "Hello" << std::endl; });
   t.join();
   return 0;
 }
