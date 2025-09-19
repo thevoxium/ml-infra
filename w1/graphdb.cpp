@@ -17,7 +17,7 @@ class Graph;
 
 using PropertyValue = std::variant<int, std::string, bool>;
 using NodePtr = std::shared_ptr<Node>;
-using EdgePrt = std::shared_ptr<Edge>;
+using EdgePtr = std::shared_ptr<Edge>;
 using NodeId = size_t;
 using EdgeId = size_t;
 
@@ -101,8 +101,12 @@ const NodePtr &Edge::getFrom() const { return this->from; }
 const NodePtr &Edge::getTo() const { return this->to; }
 
 int main() {
-  NodePtr nodeA = std::make_shared<NodePtr>(1, "anshul");
+  NodePtr nodeA = std::make_shared<Node>(1, "anshul");
   nodeA->setProperty("age", 24);
 
+  NodePtr nodeB = std::make_shared<Node>(1, "batman");
+  nodeB->setProperty("age", 45);
+
+  EdgePtr edgeAtoB = std::make_shared<Edge>(1, "AtoB", nodeA, nodeB);
   return 0;
 }
