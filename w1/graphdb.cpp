@@ -114,13 +114,13 @@ public:
   Graph(Graph &&) = default;
   Graph &operator=(Graph &&) = default;
 
-  NodePtr createNode(std::string &label);
+  NodePtr createNode(const std::string &label);
   NodePtr getNode(NodeId id) const;
-  EdgePtr createEdge(std::string &label, NodePtr from, NodePtr to);
+  EdgePtr createEdge(const std::string &label, NodePtr from, NodePtr to);
   EdgePtr getEdge(EdgeId id) const;
 };
 
-NodePtr Graph::createNode(std::string &label) {
+NodePtr Graph::createNode(const std::string &label) {
   NodePtr newNode = std::make_shared<Node>(this->nextNodeId, label);
   this->nodes[this->nextNodeId++] = newNode;
   return newNode;
@@ -133,7 +133,7 @@ NodePtr Graph::getNode(NodeId id) const {
   return it->second;
 }
 
-EdgePtr Graph::createEdge(std::string &label, NodePtr from, NodePtr to) {
+EdgePtr Graph::createEdge(const std::string &label, NodePtr from, NodePtr to) {
   EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label, from, to);
   this->edges[this->nextEdgeId++] = newEdge;
   return newEdge;
