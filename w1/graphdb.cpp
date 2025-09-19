@@ -1,12 +1,8 @@
-#include <algorithm>
 #include <cstddef>
 #include <iostream>
 #include <memory>
-#include <queue>
-#include <stack>
 #include <stdexcept>
 #include <string>
-#include <sys/_types/_ssize_t.h>
 #include <unordered_map>
 #include <variant>
 #include <vector>
@@ -106,6 +102,7 @@ private:
   EdgeId nextEdgeId = 0;
   std::unordered_map<NodeId, NodePtr> nodes;
   std::unordered_map<EdgeId, EdgePtr> edges;
+  std::unordered_map<NodeId, std::vector<EdgePtr>> adjList;
 
 public:
   Graph() = default;
@@ -118,6 +115,8 @@ public:
   NodePtr getNode(NodeId id) const;
   EdgePtr createEdge(const std::string &label, NodePtr from, NodePtr to);
   EdgePtr getEdge(EdgeId id) const;
+
+  const std::vector<EdgePtr> &getEdgesFromNode(NodeId nodeId) const;
 };
 
 NodePtr Graph::createNode(const std::string &label) {
@@ -136,6 +135,7 @@ NodePtr Graph::getNode(NodeId id) const {
 EdgePtr Graph::createEdge(const std::string &label, NodePtr from, NodePtr to) {
   EdgePtr newEdge = std::make_shared<Edge>(this->nextEdgeId, label, from, to);
   this->edges[this->nextEdgeId++] = newEdge;
+  this->adjList[from->getId()].push_back(newEdge);
   return newEdge;
 }
 EdgePtr Graph::getEdge(EdgeId id) const {
@@ -145,10 +145,29 @@ EdgePtr Graph::getEdge(EdgeId id) const {
   }
   return it->second;
 }
+const std::vector<EdgePtr> &Graph::getEdgesFromNode(NodeId nodeId) const {
+  static const std::vector<EdgePtr> emptyVector;
+  auto it = this->adjList.find(nodeId);
+  if (it == this->adjList.end()) {
+    return emptyVector;
+  }
+  return it->second;
+}
+
 int main() {
   Graph graph;
   NodePtr nodeA = graph.createNode("anshul");
   NodePtr nodeB = graph.createNode("batman");
-  EdgePtr edgeAtoB = graph.createEdge("AtoB", nodeA, nodeB);
+  NodePtr nodeC = graph.createNode("charlie");
+
+  EdgePtr edgeAtoB = graph.createEdge("friend", nodeA, nodeB);
+  EdgePtr edgeAtoC = graph.createEdge("colleague", nodeA, nodeC);
+
+  const auto &edgesFromA = graph.getEdgesFromNode(nodeA->getId());
+  std::cout << "Edges from node A: " << edgesFromA.size() << std::endl;
+
+  const auto &edgesFromB = graph.getEdgesFromNode(nodeB->getId());
+  std::cout << "Edges from node B: " << edgesFromB.size() << std::endl;
+
   return 0;
 }
