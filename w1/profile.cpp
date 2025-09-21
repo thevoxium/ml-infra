@@ -17,7 +17,7 @@ bool isPrime(int n) {
 int main() {
   auto start = std::chrono::high_resolution_clock::now();
 
-  int limit = 200000; // Change this to make it heavier
+  int limit = 1000000; // Change this to make it heavier
   std::vector<int> primes;
 
   for (int i = 2; i < limit; i++) {
