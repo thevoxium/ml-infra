@@ -43,7 +43,7 @@ Node* random_(int n){
 }
 
 int main(){
-  int n = 1000000;
+  int n = 1001000;
   Node* head1 = seq(n);
   Node* head2 = random_(n);
   printf("%f \n", head1->value);
