@@ -1,0 +1,11 @@
+CPU(s):                                  8
+Model name:                              AMD Ryzen 5 3550H with Radeon Vega Mobile Gfx
+Thread(s) per core:                      2
+Core(s) per socket:                      4
+Socket(s):                               1
+L1d cache:                               128 KiB (4 instances)
+L1i cache:                               256 KiB (4 instances)
+L2 cache:                                2 MiB (4 instances)
+L3 cache:                                4 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-7

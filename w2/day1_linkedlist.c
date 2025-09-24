@@ -1,5 +1,7 @@
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct Node{
   float value;
@@ -22,29 +24,49 @@ Node* seq(int n){
   return &arr[0];
 }
 
-
 Node* random_(int n){
-  Node* head = NULL;
-  Node* prev = NULL;
+  Node** arr = malloc(n * sizeof(Node*));
+  if(arr == NULL){
+    return NULL;
+  }
   for(int i=0; i<n; i++){
-    Node* curr = malloc(sizeof(Node));
-    if(curr == NULL){
+    arr[i] = malloc(sizeof(Node));
+    if(arr[i] == NULL){
       return NULL;
     }
-    curr->value = i;
-    if(prev == NULL){
-      head = curr;
-    }else{
-      prev->next= curr;
-    }
-    prev = curr;
+    arr[i]->value = i;
+    arr[i]->next = NULL;
   }
+  for(int i=n-1; i>0; i--){
+    int j = rand() % (i+1);
+    Node* tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+  }
+  for(int i=0; i<n-1; i++){
+    arr[i]->next = arr[i+1];
+  }
+  arr[n-1]->next = NULL;
+  Node* head = arr[0];
+  free(arr);
   return head;
 }
 
+double traverse(Node* head) {
+    double sum = 0;
+    while (head) {
+        sum += head->value;
+        head = head->next;
+    }
+    return sum;
+}
+
 int main(){
-  int n = 1001000;
+  srand(time(NULL));
+  int n = 1000000;
   Node* head1 = seq(n);
   Node* head2 = random_(n);
-  printf("%f \n", head1->value);
-  printf("%f \n", head2->value); return 0; }
+  printf("Seq sum: %f\n", traverse(head1));
+  printf("Random sum: %f\n", traverse(head2));
+  return 0;
+}
